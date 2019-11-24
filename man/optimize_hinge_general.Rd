@@ -41,11 +41,11 @@ optimize_hinge_general(y, X, reg_matrix = diag(p), n = length(y),
 
 \item{long_cg_lim}{how many gradient-based steps to take at each SA iteration}
 
-\item{ignore_below_zero}{stop SA search if a value is discovered below zero. This is irrelevant if weights are positive, and is useful in MCR binary search, but may cause problems for other applications of this function beyond MCR.}
+\item{ignore_below_zero}{stop SA search if a value is discovered below zero. This is irrelevant if weights are positive, and is useful within the MCR binary search, but may cause problems for other applications of this function beyond the computation of MCR.}
 }
 \value{
 a linear coefficient vector
 }
 \description{
-The optimization uses simulated annealing (SA), with a gradient-based search at each step.
+The optimization uses simulated annealing (SA), with a gradient-based search at each step. (Used in our paper, but not the primary focus of this package; the default option of ignore_below_zero=TRUE may cause problems in uses of this function beyond the scope of MCR, outside of this package.)
 }

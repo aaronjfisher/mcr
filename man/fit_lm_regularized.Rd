@@ -4,7 +4,8 @@
 \alias{fit_lm_regularized}
 \title{Can be used to fit either kernel models or regularized linear models}
 \usage{
-fit_lm_regularized(suff_stats, alpha = NA, reg_threshold = Inf, tol = NA)
+fit_lm_regularized(suff_stats, alpha = NA, reg_threshold = Inf,
+  tol = NA)
 }
 \arguments{
 \item{suff_stats}{output from \code{\link{get_suff_stats_kernel}}, or from the internal function \code{get_suff_stats_lm}. See also \code{\link{precompute_mcr_objects_and_functions}}}

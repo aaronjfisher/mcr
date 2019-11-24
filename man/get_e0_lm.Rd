@@ -7,7 +7,7 @@
 get_e0_lm(model, suff_stats)
 }
 \arguments{
-\item{model}{a coefficient vector (see \code{\link{get_lm_regularized}})}
+\item{model}{a coefficient vector (see \code{\link{fit_lm_regularized}})}
 
 \item{suff_stats}{output from \code{\link{get_suff_stats_kernel}}, or from the internal function \code{get_suff_stats_lm}. See also \code{\link{precompute_mcr_objects_and_functions}}}
 }

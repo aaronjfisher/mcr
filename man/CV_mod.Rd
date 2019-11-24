@@ -16,7 +16,7 @@ CV_mod(y, X, n_folds = min(15, length(y)), fit_fun, report_fun,
 
 \item{fit_fun}{takes \code{y}, \code{X} as named arguments and returns a prediction model that can be entered into \code{report_fun}.}
 
-\item{report_fun}{has arguments \code{mod}, in the form of the returned value of \code{fit_fun}, as well as \code{y} and \code{X}, in the same format as the inputs \code{y} and \code{X} to the overall function \code{CV_mod}. \code{report_fun} should return a numeric vector.}
+\item{report_fun}{has arguments \code{mod}, in the form of the returned value of \code{fit_fun}, as well as \code{y} and \code{X}, in the same format as the inputs \code{y} and \code{X} to the overall function \code{CV_mod}. The returned value of \code{report_fun} should be a numeric vector.}
 
 \item{fit_in_sample}{whether the within-fold performance metrics should also be reported, in addition to the out-of-fold metrics.}
 

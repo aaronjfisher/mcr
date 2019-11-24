@@ -5,8 +5,9 @@
 \title{Get loop-invariant quantities for empirical MCR binary search calculation, for regression in a RKHS.}
 \usage{
 get_suff_stats_kernel(y, X, dat_ref, kern_fun, p1 = NULL,
-  reg_threshold = Inf, tol = 10^-10, nrep_sample = 2, verbose = TRUE,
-  warn_psd = TRUE, warn_duplicate = TRUE, warn_dropped = TRUE)
+  reg_threshold = Inf, tol = 10^-10, nrep_sample = 2,
+  verbose = TRUE, warn_psd = TRUE, warn_duplicate = TRUE,
+  warn_dropped = TRUE)
 }
 \arguments{
 \item{y}{scalar outcome vector}
@@ -15,13 +16,15 @@ get_suff_stats_kernel(y, X, dat_ref, kern_fun, p1 = NULL,
 
 \item{dat_ref}{reference matrix of covariances}
 
+\item{kern_fun}{kernel function to use}
+
 \item{p1}{index of X to permute}
 
 \item{reg_threshold}{norm constraint for model class}
 
 \item{tol}{tolerance used for calculations}
 
-\item{nrep_sample}{the number of copies of the sample to be created. Warning: setting this equal to length(y) leads to quadratic computation time.}
+\item{nrep_sample}{see \code{\link{get_full_sample}}}
 
 \item{verbose}{whether to report results during computation}
 
@@ -30,8 +33,6 @@ get_suff_stats_kernel(y, X, dat_ref, kern_fun, p1 = NULL,
 \item{warn_duplicate}{whether to warn if duplicated rows of dat_ref are dropped}
 
 \item{warn_dropped}{passed to \code{\link{get_full_sample}}}
-
-\item{nrep_sample}{see \code{\link{get_full_sample}}}
 }
 \description{
 Creates `nrep_sample` copies of the sample, each of which permutes the covariate of interest in a different way. (Primarily intended for internal use.)

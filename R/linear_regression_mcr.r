@@ -11,43 +11,6 @@
 # | |____  | |  | |
 # |______| |_|  |_|
 
-# Updated function, replacing get_sphere_bound_B_PLS
-get_sphere_bound_B_diag <- function(M_X, M_beta, V=simDiagBasis(M_X,M_beta), min_y, max_y, r_x=NA, r_beta, X=NA, r_x_factor=NA){
-
-
-	############## Error checks & filling in vectors
-
-	p <- dim(M_X)[1]
-	if(any(p != c(dim(M_X),dim(M_beta)))) stop('M_X, M_beta dimension error')
-
-	#Fill in r_x
-	if(is.na(r_x)){
-		if(any(is.na(X)) | is.na(r_x_factor))stop('data (X) and r_x_factor required if r_x not supplied')
-		if(dim(X)[2]!=p) stop('X dimension error')
-		empirical_XMX <- apply(X, 1, function(z){
-			c(matrix(z,nrow=1)%*%M_X %*% matrix(z,ncol=1))
-		})
-		r_x <- max(empirical_XMX) * r_x_factor
-	}
-
-	DXmat <- t(V)%*%M_X%*%V
-	DBmat <- t(V)%*%M_beta%*%V
-	
-	#### Convert to diagonal vectors, check for errors in process
-	DX <- diag(DXmat)
-	DB <- diag(DBmat)
-	max_diag_error <- max(c(
-		abs(diag(DX)-DXmat),
-		abs(diag(DB)-DBmat)
-	))
-	if(max_diag_error/median(DX)>10^-10) warning(paste('Diagonalization error ',max_diag_error))
-	#### 
-
-	############## Actual computation:
-	f_max <- max( (DX*DB)^(-1/2) * sqrt(r_x*r_beta) )
-	max(c(  ((min_y)-f_max)^2,  ((min_y)+f_max)^2  ))
-}
-
 
 
 
@@ -97,7 +60,7 @@ get_ytX_perm_lm <- function(y,X,p1){
 
 
 # For internal use
-# Get loop invariant statistics for MCR binary search w/ linear model class 
+# Get loop invariant statistics for MCR binary search with linear model class 
 # and squared error loss
 get_suff_stats_lm <- function(y,X,p1=NULL,tol=10^-10, reg_threshold=Inf, reg_matrix=NA){
 
@@ -130,7 +93,7 @@ get_suff_stats_lm <- function(y,X,p1=NULL,tol=10^-10, reg_threshold=Inf, reg_mat
 #' Get standard ("original") mean-squared-error for linear or kernel models. 
 #' 
 #' Can be used to calculate loss of a reference model, to determine epsilon.
-#' @param model a coefficient vector (see \code{\link{get_lm_regularized}})
+#' @param model a coefficient vector (see \code{\link{fit_lm_regularized}})
 #' @param suff_stats output from \code{\link{get_suff_stats_kernel}}, or from the internal function \code{get_suff_stats_lm}. See also \code{\link{precompute_mcr_objects_and_functions}}
 #' @return Mean-squared-error in the sample.
 #' @export
@@ -270,25 +233,11 @@ fit_lm_regularized <- function(suff_stats, alpha=NA, reg_threshold=Inf, tol=NA){
 
 
 
-################# (!!) Deprecated function used in previous drafts
-CV_lm <- function(y,X, n_folds=min(15,length(y))){ 
-	CV_mod(y=y,X=X,
-		fit_fun = function(y,X){lm(y~X-1)},
-		report_fun = function(y,X,mod){
-			B <- mod$coefficients
-			if(any(is.na(B))){
-				B[is.na(B)] <- 0; warning('na found in coeff')
-			}
-			mean((y- X %*% B)^2)
-		}
-	)
-}
-#################
 
 
 
-
-#' Cross validate a kernel-least-squares, or kernel-regression model
+#' Cross validate a kernel-least-squares, or kernel-regression model.
+#' 
 #' @export
 #' @param y outcome vector
 #' @param X covariate matrix
@@ -296,8 +245,9 @@ CV_lm <- function(y,X, n_folds=min(15,length(y))){
 #' @param type either 'RKHS' or 'regression'
 #' @param alpha penalization parameter for 'RKHS' (see \code{\link{fit_lm_regularized}})
 #' @param dat_ref previously observed "reference" matrix of covariates, for 'RKHS'
-#' @param warn_interal give warning if no dat_ref is not provided
+#' @param warn_internal give warning if no dat_ref is not provided
 #' @param kern_fun kernel function used
+#' @param ... passed to \code{get_suff_stats_kernel}, for internal use.
 CV_kernel <- function(y,X, n_folds=min(15,length(y)), type, alpha, dat_ref=NA, warn_internal=TRUE, kern_fun,...){
 	#!! ... send to get_suff_stats, not fit_lm_regularized
 	# (!!) Would be better if cv_mod allowed for fit_fun and report_fun to take indeces, optionally, instead of X,y.
@@ -345,7 +295,7 @@ CV_kernel <- function(y,X, n_folds=min(15,length(y)), type, alpha, dat_ref=NA, w
 
 
 
-# !!!! Combine this with UNregularized function to reduce redundancy
+# !! Combine this with UNregularized function to reduce redundancy
 get_h_min_lm_regularized <- function(s,gam,suff_stats,loop_dep_args
 =NULL){
 
@@ -399,9 +349,9 @@ get_h_min_lm_regularized <- function(s,gam,suff_stats,loop_dep_args
 #' 
 #' @param y scalar outcome vector
 #' @param X matrix of covariates
+#' @param kern_fun kernel function to use
 #' @param dat_ref reference matrix of covariances
 #' @param p1 index of X to permute
-#' @param nrep_sample the number of copies of the sample to be created. Warning: setting this equal to length(y) leads to quadratic computation time.
 #' @param reg_threshold norm constraint for model class
 #' @param tol tolerance used for calculations
 #' @param verbose whether to report results during computation
@@ -410,7 +360,7 @@ get_h_min_lm_regularized <- function(s,gam,suff_stats,loop_dep_args
 #' @param warn_duplicate whether to warn if duplicated rows of dat_ref are dropped
 #' @param warn_dropped passed to \code{\link{get_full_sample}}
 #' 
-#' @import kernlab
+#' @importFrom kernlab kernelMatrix
 #' @export
 get_suff_stats_kernel <- function(y,X,dat_ref,kern_fun,p1=NULL, reg_threshold=Inf, tol=10^-10, nrep_sample=2, verbose=TRUE, warn_psd=TRUE, warn_duplicate=TRUE, warn_dropped=TRUE){
 	# output will be identical to that of get_suff_stats_lm,
@@ -432,7 +382,7 @@ get_suff_stats_kernel <- function(y,X,dat_ref,kern_fun,p1=NULL, reg_threshold=In
 
 	eigen_K_D <- eigen(K_D)
 	if(any(eigen_K_D$values<=tol)){
-		#!! Is there a more elegant way to deal with this?
+		#!! Perhaps there is a more elegant way to deal with this?
 		err_K_D <- tail(eigen_K_D$values,3)
 		add_to_K_D <- tol*2
 		K_D <- K_D + diag(dim(K_D)[1]) * add_to_K_D
@@ -528,7 +478,7 @@ get_suff_stats_kernel <- function(y,X,dat_ref,kern_fun,p1=NULL, reg_threshold=In
 }
 
 # Predict RKHS output
-pred_RKHS <- function(K_stnd=NA, X=NA, dat_ref=NA, model, ...){
+pred_RKHS <- function(K_stnd=NA, X=NA, dat_ref=NA,kern_fun=NA, model, ...){
 	if(any(is.na(K_stnd))) K_stnd <- as.matrix(kernelMatrix(x=X,y=dat_ref,kernel=kern_fun))
 	predictor <- K_stnd
 	if( length(model) == dim(K_stnd)[2] + 1){
@@ -554,8 +504,8 @@ norm_RKHS <- function(K_D=NA, dat_ref=NA, model, kern_fun){
 
 #' Get prediction from a (Nadaraya–Watson) kernel regression model
 #' @param X covariate matrix for which predictions are desired
-#' @param X covariate matrix for existing data
-#' @param y corresponding output vector for existing data
+#' @param X_ref covariate matrix for existing data
+#' @param y_ref corresponding output vector for existing data
 #' @param kern_fun kernel function to use
 kernel_regression_prediction <- function(X, X_ref, y_ref, kern_fun){
 	#Simple kernel smoother estimator
@@ -564,7 +514,7 @@ kernel_regression_prediction <- function(X, X_ref, y_ref, kern_fun){
 	c(W %*% y_ref)
 
 	# !! Note - See KRLS package to see how they handle binary covariates
-		# However, this package doesn't let you specify a present reference dataset? It always uses all your data!
+		# However, this package does not appear to let you specify a present reference dataset; it always uses all your data.
 
 }
 

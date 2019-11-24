@@ -17,13 +17,15 @@ getMCR_internal(s, precomputed, eps, tol_mcr = 2^(-20),
 
 \item{tol_mcr}{tolerance for MCR binary search}
 
-\item{force_lower_0}{(TRUE is reccomended) This option can greatly reduce computation time for MCR-, and does not affect MCR+. For MCR-, it tells us to leverage fact that MR values <=1 have a similar interpretation, i.e., null reliance. If MCR- is >=1, this option will have no effect. If MCR- is <=1, this option directs us to not compute to additional precision beyond the fact that it is <=1.}
+\item{force_lower_0}{(TRUE is reccomended) This option can greatly reduce computation time for MCR-, and does not affect MCR+. For MCR-, setting force_lower_0=TRUE tells us to leverage fact that MR values <=1 have a similar interpretation, i.e., null reliance. If MCR- is >=1, this option setting will have no effect. If MCR- is <=1, this option setting directs us to not compute to additional precision beyond the fact that it is <=1.}
 
 \item{warn_lower_0}{flags when the search stops early due to finding a well-performing model with MR < 1. As discussed above, this can occur intentionally when force_lower_0=TRUE, and is often not a problem.}
 
 \item{maxiter_BS}{maximum number of iterations for the binary serach.}
 
 \item{verbose}{either 'pb' (progress bar),'full', or other for no progress messages.}
+
+\item{...}{passed to \code{\link{precompute_mcr_objects_and_functions}}}
 }
 \value{
 A list containing \itemize{
@@ -31,8 +33,8 @@ A list containing \itemize{
 \item \code{approximation_error_linear} - The difference between the computed bound on MCR, and the most extreme MR value found for a valid model, during the search.
 \item \code{approximation_error_search} - The largest possible reduction to the approximation error that could be achieved by continuing the search. This is computed based on the fact that our binary search method uses linearizations.
 \item \code{gam_opt} - (For internal use) final binary search parameter value.
-\item \code{s} - A value equal to -1 for MCR-, and +1 for MCR. 
-\item \code{full_model_output} - More detailed description of the final model identified, which will depend on the selected model class.
+\item \code{s} - see Arguments. 
+\item \code{full_model_output} - More detailed description of the final model identified, which will depend on the selected model class (see arguments for \code{\link{precompute_mcr_objects_and_functions}}).
 \item \code{searchpath} - Output from steps of the search, used for \code{\link{plot_empirical_MCR_searchpath}}.
 }
 }

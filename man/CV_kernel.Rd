@@ -2,10 +2,10 @@
 % Please edit documentation in R/linear_regression_mcr.r
 \name{CV_kernel}
 \alias{CV_kernel}
-\title{Cross validate a kernel-least-squares, or kernel-regression model}
+\title{Cross validate a kernel-least-squares, or kernel-regression model.}
 \usage{
-CV_kernel(y, X, n_folds = min(15, length(y)), type, alpha, dat_ref = NA,
-  warn_internal = TRUE, kern_fun, ...)
+CV_kernel(y, X, n_folds = min(15, length(y)), type, alpha,
+  dat_ref = NA, warn_internal = TRUE, kern_fun, ...)
 }
 \arguments{
 \item{y}{outcome vector}
@@ -20,10 +20,12 @@ CV_kernel(y, X, n_folds = min(15, length(y)), type, alpha, dat_ref = NA,
 
 \item{dat_ref}{previously observed "reference" matrix of covariates, for 'RKHS'}
 
+\item{warn_internal}{give warning if no dat_ref is not provided}
+
 \item{kern_fun}{kernel function used}
 
-\item{warn_interal}{give warning if no dat_ref is not provided}
+\item{...}{passed to \code{get_suff_stats_kernel}, for internal use.}
 }
 \description{
-Cross validate a kernel-least-squares, or kernel-regression model
+Cross validate a kernel-least-squares, or kernel-regression model.
 }

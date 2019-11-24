@@ -4,10 +4,10 @@
 \alias{plot_empirical_MCR_searchpath}
 \title{Plot all models found during MCR binary search, and the associated MR boundaries for any model in the class.}
 \usage{
-plot_empirical_MCR_searchpath(emp_mcr, eps = NA, ylab = NA, xlab = NA,
-  show_all_lines = FALSE, show_mcr_range = FALSE, ylim_include = NULL,
-  add_to_plot = FALSE, xlim_include = NULL, xlim_1 = TRUE,
-  fill_col = NA, ...)
+plot_empirical_MCR_searchpath(emp_mcr, eps = NA, ylab = NA,
+  xlab = NA, show_all_lines = FALSE, show_mcr_range = FALSE,
+  add_to_plot = FALSE, ylim_include = NULL, xlim_include = NULL,
+  xlim_1 = TRUE, fill_col = NA, ...)
 }
 \arguments{
 \item{emp_mcr}{output from `get_empirical_MCR`}
@@ -20,15 +20,17 @@ plot_empirical_MCR_searchpath(emp_mcr, eps = NA, ylab = NA, xlab = NA,
 
 \item{show_mcr_range}{additionally plots brackets corresponding to empirical MCR}
 
-\item{ylim_include}{vector of numeric values that should be contained in ylim}
-
 \item{add_to_plot}{whether to add lines to an existing plot, or to create a new plot}
+
+\item{ylim_include}{vector of numeric values that should be contained in ylim}
 
 \item{xlim_include}{vector of numeric values that should be contained in xlim}
 
 \item{xlim_1}{whether xlim should truncate at value 1 (null reliance)}
 
 \item{fill_col}{color to shade in region below permorfance threshold. If NA, no shading is applied.}
+
+\item{...}{passed to \code{\link{points}} & \code{\link{matlines}}.}
 }
 \description{
 Plot all models found during MCR binary search, and the associated MR boundaries for any model in the class.

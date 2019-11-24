@@ -28,7 +28,7 @@ get_empirical_MCR(eps, precomputed = NA, ...)
 
 \item{p1}{numeric index marking which columns of X to compute importance for.}
 
-\item{model_class_loss}{(optional) Signify a preset model class and loss function for which existing code in the package is already written. Currently supports 'linear_mse' for linear regression with the squared error loss; 'kernel_mse' for regression in a reproducing kernel Hilbert space, with the squared error loss; and 'linear_hinge' for linear classification with the hinge loss (y = -1 or 1). If this option is not set, both \code{minimize_weighted_loss} and \code{get_loss} must be set.}
+\item{model_class_loss}{(optional) Signify a preset model class and loss function. This package currently supports 'linear_mse' for linear regression with the squared error loss; 'kernel_mse' for regression in a reproducing kernel Hilbert space, with the squared error loss; and 'linear_hinge' for linear classification with the hinge loss (y = -1 or 1). If this option is not set, both \code{minimize_weighted_loss} and \code{get_loss} must be set.}
 
 \item{minimize_weighted_loss}{(optional) a function with named inputs \code{X}, \code{y}, \code{case.weights}, and (optionally) \code{start}. The function should export a model object which minimizes the sum of losses for the dataset (y,X). Any model format is acceptable, as long as it can be read by \code{get_loss}. The (optional) input \code{start} should also take the same format as the output of \code{minimize_weighted_loss}. Regularization constraints should also be accounted for in this function.}
 
@@ -50,5 +50,5 @@ get_empirical_MCR(eps, precomputed = NA, ...)
 \code{get_empirical_MCR} returns a list containing the MCR range, the epsilon value, and more detailed results (\code{minus} and \code{plus}) for each end of the MCR interval (see \code{\link{getMCR_internal}} for more details).
 }
 \description{
-Main functions for computing model reliance (MR) and model class reliance (MCR). For further details, see \code{\link{getMCR_internal}}.
+Main functions for computing model reliance (MR) and model class reliance (MCR). For further details, see \code{\link{getMCR_internal}}. The function \code{precompute_mcr_objects_and_functions} computes objects that are used within the MCR search procedure.
 }

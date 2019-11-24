@@ -7,17 +7,17 @@
 
 #' General function for cross-validation
 #' 
-#' Calculate the cross-validated (CV) loss of a model fitting algorithm \code{fit_fun}.
-#'
+#' Calculate the cross-validated (CV) loss of a model fitting algorithm \code{fit_fun}. 
 #' @param y outcome vector
 #' @param X covariate matrix
 #' @param n_folds number of folds for CV
 #' @param fit_fun takes \code{y}, \code{X} as named arguments and returns a prediction model that can be entered into \code{report_fun}.
-#' @param report_fun has arguments \code{mod}, in the form of the returned value of \code{fit_fun}, as well as \code{y} and \code{X}, in the same format as the inputs \code{y} and \code{X} to the overall function \code{CV_mod}. \code{report_fun} should return a numeric vector.
+#' @param report_fun has arguments \code{mod}, in the form of the returned value of \code{fit_fun}, as well as \code{y} and \code{X}, in the same format as the inputs \code{y} and \code{X} to the overall function \code{CV_mod}. The returned value of \code{report_fun} should be a numeric vector.
 #' @param fit_in_sample whether the within-fold performance metrics should also be reported, in addition to the out-of-fold metrics.
 #' @param verbose show progress bar
 #'
 #' @return The mean of \code{report_fun}'s out-of-fold output, averaged across folds. If \code{fit_in_sample=TRUE}, the within-fold output is also shown.
+#' @import pbapply
 #' @export
 CV_mod <- function(y,X, n_folds=min(15,length(y)), fit_fun, report_fun, fit_in_sample=FALSE, verbose=FALSE){
 
@@ -69,7 +69,7 @@ CV_mod <- function(y,X, n_folds=min(15,length(y)), fit_fun, report_fun, fit_in_s
 #' @param n original sample size
 #' @param seed seed used for random permuations of the sample
 #' @param p1 indeces for the variables to be switched
-#' @param nrep_sample setting `nrep_sample=2` corresponds to e_divide to approximate e_switch. Increasing `nrep_sample` further increases the number of terms used in the approximation of e_switch. If `nrep_sample =n,` all permutations are returned.
+#' @param nrep_sample setting `nrep_sample=2` corresponds to using e_divide to approximate e_switch. Increasing `nrep_sample` further increases the number of terms used in the approximation of e_switch. If `nrep_sample =n,` all permutations are returned.
 #' @param warn_dropped whether to give a warning if nrep_sample does not divide evenly into n. In this case, some number of observations (less than nrep_sample) will be dropped.
 get_full_sample <- function(y,X,p1,n=length(y),nrep_sample=2,seed=0, warn_dropped=TRUE){
 	p <- dim(X)[2]
@@ -144,12 +144,12 @@ get_MR_general <- function(model, precomputed = NA, ...){
 
 #' Compute MR & MCR
 #' 
-#' Main functions for computing model reliance (MR) and model class reliance (MCR). For further details, see \code{\link{getMCR_internal}}.
+#' Main functions for computing model reliance (MR) and model class reliance (MCR). For further details, see \code{\link{getMCR_internal}}. The function \code{precompute_mcr_objects_and_functions} computes objects that are used within the MCR search procedure.
 #' 
 #' @param X a matrix or dataframe of covariates
 #' @param y outcome vector
 #' @param p1 numeric index marking which columns of X to compute importance for.
-#' @param model_class_loss (optional) Signify a preset model class and loss function for which existing code in the package is already written. Currently supports 'linear_mse' for linear regression with the squared error loss; 'kernel_mse' for regression in a reproducing kernel Hilbert space, with the squared error loss; and 'linear_hinge' for linear classification with the hinge loss (y = -1 or 1). If this option is not set, both \code{minimize_weighted_loss} and \code{get_loss} must be set.
+#' @param model_class_loss (optional) Signify a preset model class and loss function. This package currently supports 'linear_mse' for linear regression with the squared error loss; 'kernel_mse' for regression in a reproducing kernel Hilbert space, with the squared error loss; and 'linear_hinge' for linear classification with the hinge loss (y = -1 or 1). If this option is not set, both \code{minimize_weighted_loss} and \code{get_loss} must be set.
 #' @param minimize_weighted_loss (optional) a function with named inputs \code{X}, \code{y}, \code{case.weights}, and (optionally) \code{start}. The function should export a model object which minimizes the sum of losses for the dataset (y,X). Any model format is acceptable, as long as it can be read by \code{get_loss}. The (optional) input \code{start} should also take the same format as the output of \code{minimize_weighted_loss}. Regularization constraints should also be accounted for in this function.  
 	# !! add examples
 #' @param get_loss (optional) a function which takes named inputs \code{model}, \code{y}, and \code{X}, and returns a vector of losses. The input \code{model} should be in the same format of the returned value of \code{minimize_weighted_loss}.
@@ -162,6 +162,7 @@ get_MR_general <- function(model, precomputed = NA, ...){
 	#' \item \code{get_MR} - a function taking \code{model} and \code{suff_stats} as input (see above), and which computes the MR of the model using the precomputed object \code{suff_stats}.
 #'}
 #' @export
+#' @import methods
 #' @rdname mcr_set
 precompute_mcr_objects_and_functions <- function(
 	# Generic solver input
@@ -330,20 +331,22 @@ precompute_mcr_objects_and_functions <- function(
 #' @param precomputed output from \code{\link{precompute_mcr_objects_and_functions}}
 #' @param eps loss threshold on the absolute scale
 #' @param tol_mcr tolerance for MCR binary search
-#' @param force_lower_0 (TRUE is reccomended) This option can greatly reduce computation time for MCR-, and does not affect MCR+. For MCR-, it tells us to leverage fact that MR values <=1 have a similar interpretation, i.e., null reliance. If MCR- is >=1, this option will have no effect. If MCR- is <=1, this option directs us to not compute to additional precision beyond the fact that it is <=1. 
+#' @param force_lower_0 (TRUE is reccomended) This option can greatly reduce computation time for MCR-, and does not affect MCR+. For MCR-, setting force_lower_0=TRUE tells us to leverage fact that MR values <=1 have a similar interpretation, i.e., null reliance. If MCR- is >=1, this option setting will have no effect. If MCR- is <=1, this option setting directs us to not compute to additional precision beyond the fact that it is <=1. 
 #' @param warn_lower_0 flags when the search stops early due to finding a well-performing model with MR < 1. As discussed above, this can occur intentionally when force_lower_0=TRUE, and is often not a problem.
 #' @param maxiter_BS maximum number of iterations for the binary serach.
 #' @param verbose either 'pb' (progress bar),'full', or other for no progress messages.
+#' @param ... passed to \code{\link{precompute_mcr_objects_and_functions}}
 #' 
 #' @return A list containing \itemize{
 #' \item \code{mcr} - the MCR value.
 #' \item \code{approximation_error_linear} - The difference between the computed bound on MCR, and the most extreme MR value found for a valid model, during the search.
 #' \item \code{approximation_error_search} - The largest possible reduction to the approximation error that could be achieved by continuing the search. This is computed based on the fact that our binary search method uses linearizations.
 #' \item \code{gam_opt} - (For internal use) final binary search parameter value.
-#' \item \code{s} - A value equal to -1 for MCR-, and +1 for MCR. 
-#' \item \code{full_model_output} - More detailed description of the final model identified, which will depend on the selected model class.
+#' \item \code{s} - see Arguments. 
+#' \item \code{full_model_output} - More detailed description of the final model identified, which will depend on the selected model class (see arguments for \code{\link{precompute_mcr_objects_and_functions}}).
 #' \item \code{searchpath} - Output from steps of the search, used for \code{\link{plot_empirical_MCR_searchpath}}.
 #' }
+#' @import utils
 getMCR_internal <- function(s, precomputed, eps,
 	tol_mcr = 2^(-20), force_lower_0=TRUE, warn_lower_0=TRUE, maxiter_BS = 400, verbose='pb',...){
 	#We search to set gam as low as possible while still meeting cond_move_down
@@ -578,11 +581,13 @@ get_empirical_MCR <- function(eps, precomputed=NA, ...){
 #' @param show_all_lines show redundant MR boundaries found in MCR search
 #' @param ylab,xlab axis labels, as in \code{\link{plot}}
 #' @param fill_col color to shade in region below permorfance threshold. If NA, no shading is applied.
+#' @param ... passed to \code{\link{points}} & \code{\link{matlines}}.
 #' @export
-plot_empirical_MCR_searchpath <- function(emp_mcr, eps=NA, ylab = NA, xlab = NA, show_all_lines=FALSE, show_mcr_range=FALSE, ylim_include =NULL, add_to_plot =FALSE, xlim_include=NULL, xlim_1 =TRUE, fill_col=NA, ...){
+#' @import graphics
+plot_empirical_MCR_searchpath <- function(emp_mcr, eps=NA, ylab = NA, xlab = NA, show_all_lines=FALSE, show_mcr_range=FALSE, add_to_plot =FALSE,ylim_include =NULL,  xlim_include=NULL, xlim_1 =TRUE, fill_col=NA, ...){
 
-	sp_m <- dplyr::filter(emp_mcr$minus$searchpath, h>=0)
-	sp_p <- dplyr::filter(emp_mcr$plus$searchpath, h>=0)
+	sp_m <- emp_mcr$minus$searchpath[emp_mcr$minus$searchpath$h>=0,]
+	sp_p <- emp_mcr$plus$searchpath[ emp_mcr$plus$searchpath$h>=0, ]
 	sp_a <- rbind(sp_m, sp_p)
 
 	###### Setup plot
@@ -667,8 +672,8 @@ plot_empirical_MCR_searchpath <- function(emp_mcr, eps=NA, ylab = NA, xlab = NA,
 # Internal function to plot e_orig versus e_switch, for interactive error checks
 # @param emp_mcr output from `get_empirical_MCR`
 plot_empirical_MCR_switch_orig <- function(emp_mcr, eps=NA, ylab = NA, xlab = NA, ...){
-	sp_m <- dplyr::filter(emp_mcr$minus$searchpath, h>=0)
-	sp_p <- dplyr::filter(emp_mcr$plus$searchpath, h>=0)
+	sp_m <- emp_mcr$minus$searchpath[emp_mcr$minus$searchpath$h>=0,]
+	sp_p <- emp_mcr$plus$searchpath[ emp_mcr$plus$searchpath$h>=0, ]
 	sp_a <- rbind(sp_m, sp_p)
 
 	if(is.na(ylab)) ylab <- 'switched empirical loss'

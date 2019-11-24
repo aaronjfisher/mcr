@@ -16,7 +16,7 @@ get_full_sample(y, X, p1, n = length(y), nrep_sample = 2, seed = 0,
 
 \item{n}{original sample size}
 
-\item{nrep_sample}{setting `nrep_sample=2` corresponds to e_divide to approximate e_switch. Increasing `nrep_sample` further increases the number of terms used in the approximation of e_switch. If `nrep_sample =n,` all permutations are returned.}
+\item{nrep_sample}{setting `nrep_sample=2` corresponds to using e_divide to approximate e_switch. Increasing `nrep_sample` further increases the number of terms used in the approximation of e_switch. If `nrep_sample =n,` all permutations are returned.}
 
 \item{seed}{seed used for random permuations of the sample}
 

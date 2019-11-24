@@ -13,7 +13,7 @@ hinge_pred <- function(pred, y, m=1){
 
 #' Calculate the hinge loss
 #' 
-#' \code{hinge_w} computes predictions, and passes these to \code{hinge_pred} to compute the in-sample hinge loss.
+#' \code{hinge_pred} computes the in-sample hinge loss, given a set of predictions. \code{hinge_w} computes predictions, and passes these to \code{hinge_pred} to compute the in-sample hinge loss.
 #' 
 #' @param w weight vector (linear classification model). First element should be an interecept term. For example, the output of \code{\link{optimize_hinge_general}}.
 #' @param X covariate matrix, should not include a constant (intercept) column.
@@ -95,7 +95,8 @@ get_hinge_obj <- function(X,y,w, reg_threshold, reg_matrix, K, case.weights){
 
 #' Optimize a linear classifier with possibly negative observation weights
 #'
-#' The optimization uses simulated annealing (SA), with a gradient-based search at each step.
+#'  
+#' The optimization uses simulated annealing (SA), with a gradient-based search at each step. (Used in our paper, but not the primary focus of this package; the default option of ignore_below_zero=TRUE may cause problems in uses of this function beyond the scope of MCR, outside of this package.)
 #' 
 #' @param y outcome vector with elements -1 or 1.
 #' @param X covariate matrix (n x p), which should not contain an interecept or constant column.
@@ -112,9 +113,9 @@ get_hinge_obj <- function(X,y,w, reg_threshold, reg_matrix, K, case.weights){
 #' @param extra_step_NM whether to follow the SA search with an additional Nelder-Mead search
 #' @param short_cg_lim tuning parameter used to set initial value of the search
 #' @param long_cg_lim how many gradient-based steps to take at each SA iteration
-#' @param ignore_below_zero stop SA search if a value is discovered below zero. This is irrelevant if weights are positive, and is useful in MCR binary search, but may cause problems for other applications of this function beyond MCR.
+#' @param ignore_below_zero stop SA search if a value is discovered below zero. This is irrelevant if weights are positive, and is useful within the MCR binary search, but may cause problems for other applications of this function beyond the computation of MCR.
 #' 
-#' @import optimr dfoptim
+#' @import optimr dfoptim stats
 #' @return a linear coefficient vector
 #'
 #' @export

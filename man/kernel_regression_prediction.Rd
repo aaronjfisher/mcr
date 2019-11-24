@@ -9,11 +9,11 @@ kernel_regression_prediction(X, X_ref, y_ref, kern_fun)
 \arguments{
 \item{X}{covariate matrix for which predictions are desired}
 
+\item{X_ref}{covariate matrix for existing data}
+
+\item{y_ref}{corresponding output vector for existing data}
+
 \item{kern_fun}{kernel function to use}
-
-\item{X}{covariate matrix for existing data}
-
-\item{y}{corresponding output vector for existing data}
 }
 \description{
 Get prediction from a (Nadaraya–Watson) kernel regression model

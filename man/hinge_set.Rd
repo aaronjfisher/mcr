@@ -3,7 +3,6 @@
 \name{hinge_set}
 \alias{hinge_set}
 \alias{hinge_pred}
-\alias{hinge_set}
 \alias{hinge_w}
 \title{Calculate the hinge loss}
 \usage{
@@ -25,5 +24,5 @@ hinge_w(w, X, ...)
 \item{...}{passed to hinge_pred}
 }
 \description{
-\code{hinge_w} computes predictions, and passes these to \code{hinge_pred} to compute the in-sample hinge loss.
+\code{hinge_pred} computes the in-sample hinge loss, given a set of predictions. \code{hinge_w} computes predictions, and passes these to \code{hinge_pred} to compute the in-sample hinge loss.
 }
