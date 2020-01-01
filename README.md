@@ -1,6 +1,6 @@
 # MCR
 
-An R package for Model Reliance and Model Class Reliance (MCR, see [Fisher et al., 2019](https://arxiv.org/abs/1801.01489)). 
+An R package for Model Reliance and Model Class Reliance (MCR, see [Fisher et al., 2019](http://www.jmlr.org/papers/v20/18-760.html)). 
 
 Given a set of models of interest (a model class), this package finds the models that rely as much, or as little as possible on variables of interest, while still performing well.
 
